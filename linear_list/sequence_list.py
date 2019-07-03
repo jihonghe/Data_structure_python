@@ -6,12 +6,12 @@ Author      :   jihonghe
 GitHub      :   github.com/jihonghe
 Contact     :   jihonghe_hjh@163.com
 Create Time :   2019/7/3 上午12:55
-Description :   
+Description :
 ------------------------------------------------
 """
 
 class SeqList(object):
-	"""一体式结构：顺序表的表信息（容量，当前长度）与元素的存储区是相邻的，即划分一块内存用于存储表信息及表数据
+	"""分离式顺序表：表元素并不保存在顺序表实例的内存中，而是仅仅记录一个索引值
 	"""
 	def __init__(self, capacity=10):
 		"""
@@ -81,7 +81,8 @@ class SeqList(object):
 	"""
 	表元素的变动操作：
 		增：append(element), insert(element, index)
-		删：del_first(), del_last(), del_by_index(index), del_by_element(element)
+		删：del_first(), del_last(), del_by_index(index), del_by_element(element), clear()
+		改：set(element, index)
 	"""
 	def append(self, element):
 		"""
@@ -176,6 +177,18 @@ class SeqList(object):
 		for j in range(self._length):
 			self._data[j] = None
 		self._length = 0
+
+	def set(self, element, index):
+		"""
+		根据给出的索引修改指定元素，若索引错误则抛出异常
+		:param element:
+		:param index:
+		:return: None
+		"""
+		if self._is_legal_index_(index):
+			self._data[index] = element
+		else:
+			raise IndexError
 
 # 表信息的获取与判断：len(), is_empty(), is_full()是获取表信息及简单判断的相关操作
 	def len(self):
