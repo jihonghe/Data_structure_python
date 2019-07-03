@@ -10,8 +10,9 @@ Description :
 ------------------------------------------------
 """
 
-class SeqList(object):
-	"""分离式顺序表：表元素并不保存在顺序表实例的内存中，而是仅仅记录一个索引值
+class SeqList:
+	"""
+	分离式顺序表：表元素并不保存在顺序表实例的内存中，而是仅仅记录一个索引值
 	"""
 	def __init__(self, capacity=10):
 		"""
@@ -235,24 +236,41 @@ class SeqList(object):
 if __name__ == '__main__':
 	# 初始化顺序表
 	seq_list = SeqList(capacity=12)
-	assert seq_list.is_empty() == True
-	assert seq_list.is_full() == False
+	print("is_empty():", seq_list.is_empty())
+	print("is_full():", seq_list.is_full())
+	#assert seq_list.is_empty() == True
+	#assert seq_list.is_full() == False
 	# 添加元素
 	for i in range(10):
 		seq_list.append(i)
-	assert seq_list.len() == 10
+	print("len():", seq_list.len())
+	#assert seq_list.len() == 10
 	# 遍历和访问表元素
 	seq_list.travel()
-	assert seq_list.get(0) == 0
-	assert seq_list.search(10) == -1
-	assert seq_list.search_start(3, 1) != -1
+	print("get(index):", seq_list.get(2))
+	print("search(index):", seq_list.search(6))
+	print("search_start(element, start):", seq_list.search_start(9, 3))
+	#assert seq_list.get(0) == 0
+	#assert seq_list.search(10) == -1
+	#assert seq_list.search_start(3, 1) != -1
 	# 表元素变动操作
+	print("length before insert:", seq_list.len())
 	seq_list.insert(3, 8)
-	assert seq_list.len() == 11
-	assert seq_list.del_first() == True
-	assert seq_list.del_last() == True
-	assert seq_list.del_by_index(3) == True
-	assert seq_list.del_by_element(3) == True
-	assert seq_list.del_by_element(19) == False
+	print("length after insert:", seq_list.len())
+	seq_list.del_first()
+	print("length after delete:", seq_list.len())
+	seq_list.travel()
+	seq_list.del_last()
+	seq_list.travel()
+	seq_list.del_by_index(3)
+	seq_list.travel()
+	seq_list.del_by_element(7)
+	#assert seq_list.len() == 11
+	#assert seq_list.del_first() == True
+	#assert seq_list.del_last() == True
+	#assert seq_list.del_by_index(3) == True
+	#assert seq_list.del_by_element(3) == True
+	#assert seq_list.del_by_element(19) == False
 	seq_list.clear()
-	assert seq_list.len() == 0
+	print("sequence is empty after clear():", seq_list.is_empty())
+	#assert seq_list.len() == 0
