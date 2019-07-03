@@ -13,15 +13,14 @@ Description :
 class SeqList(object):
 	"""一体式结构：顺序表的表信息（容量，当前长度）与元素的存储区是相邻的，即划分一块内存用于存储表信息及表数据
 	"""
-	def __init__(self, length = 0, capacity=10):
+	def __init__(self, capacity=10):
 		"""
 		创建一体式结构顺序表
-		:param length: 当前元素个数
 		:param capacity: 顺序表容量
 		"""
-		self.capacity = capacity
-		self.length = length
-		self.data = [None] * capacity
+		self._capacity = capacity
+		self._length = 0
+		self._data = [None] * capacity
 
 # 表元素的查找与访问：travel(), get(index), search(element), search_start(element, start)
 
@@ -30,8 +29,9 @@ class SeqList(object):
 		遍历表元素
 		:return: None
 		"""
-		for e in self.data:
+		for e in self._data:
 			print(e, end=', ')
+		print()
 
 	def get(self, index):
 		"""
@@ -40,11 +40,11 @@ class SeqList(object):
 		:return: index正确则返回对应的元素，否则抛出异常
 		"""
 		if not isinstance(index, int):
-			print("Parameter index must be int")
+			raise TypeError
 		elif self._is_legal_index_(index):
-			return self.data[index]
+			return self._data[index]
 		else:
-			print("Error: %d out of range" % index)
+			raise IndexError
 
 	def search(self, element):
 		"""
@@ -54,8 +54,8 @@ class SeqList(object):
 		"""
 		first = 0
 
-		while first < self.length:
-			if self.data[first] == element:
+		while first < self._length:
+			if self._data[first] == element:
 				return first
 			first += 1
 
@@ -70,13 +70,13 @@ class SeqList(object):
 		"""
 		if self._is_legal_index_(start):
 			first = start + 1
-			while first < self.length:
-				if self.data[first] == element:
+			while first < self._length:
+				if self._data[first] == element:
 					return first
 				first += 1
 			return -1
 		else:
-			print("Error: %d out of range" % start)
+			raise IndexError
 
 	"""
 	表元素的变动操作：
@@ -90,10 +90,10 @@ class SeqList(object):
 		:return: None
 		"""
 		if not self.is_full():
-			self.data[self.length] = element
-			self.length += 1
+			self._data[self._length] = element
+			self._length += 1
 		else:
-			print("The sequence is already full")
+			raise Exception
 
 	def insert(self, element, index):
 		"""
@@ -104,10 +104,10 @@ class SeqList(object):
 		"""
 		if self._is_legal_index_(index) and not self.is_full():
 			self._move_(op_index=index, op_type="insert")
-			self.data[index] = element
-			self.length += 1
+			self._data[index] = element
+			self._length += 1
 		else:
-			print("Error: index out of range")
+			raise IndexError
 
 	def del_first(self):
 		"""
@@ -116,7 +116,7 @@ class SeqList(object):
 		"""
 		if not self.is_empty():
 			self._move_(op_index=0, op_type="delete")
-			self.length -= 1
+			self._length -= 1
 			return True
 		else:
 			print("Error: list is empty")
@@ -128,8 +128,8 @@ class SeqList(object):
 		:return: 成功则返回 True，失败则返回 False
 		"""
 		if not self.is_empty():
-			self.data[self.length - 1] = None
-			self.length -= 1
+			self._data[self._length - 1] = None
+			self._length -= 1
 			return True
 		else:
 			print("Error: list is empty")
@@ -142,9 +142,9 @@ class SeqList(object):
 		:return: 删除成功则返回 True，失败则返回 False
 		"""
 		if self._is_legal_index_(index):
-			if self.is_empty():
+			if not self.is_empty():
 				self._move_(op_index=index, op_type="delete")
-				self.length -= 1
+				self._length -= 1
 				return True
 			else:
 				print("Error: list is empty")
@@ -162,11 +162,20 @@ class SeqList(object):
 		e_index = self.search(element)
 		if e_index != -1:
 			self._move_(op_index=e_index, op_type="delete")
-			self.length -= 1
+			self._length -= 1
 			return True
 		else:
 			print("Error: element not found")
 			return False
+
+	def clear(self):
+		"""
+		清空列表元素
+		:return: None
+		"""
+		for j in range(self._length):
+			self._data[j] = None
+		self._length = 0
 
 # 表信息的获取与判断：len(), is_empty(), is_full()是获取表信息及简单判断的相关操作
 	def len(self):
@@ -174,38 +183,63 @@ class SeqList(object):
 		返回顺序表长度
 		:return: 顺序表长度
 		"""
-		return self.length
+		return self._length
 
 	def is_empty(self):
 		"""
 		判断表是否为空
 		:return: 空 -> True，不为空 -> False
 		"""
-		return self.length == 0
+		return self._length == 0
 
 	def is_full(self):
 		"""
 		判断表是否已满
 		:return: 满 -> True，不满 -> False
 		"""
-		return self.length == self.capacity
+		return self._length == self._capacity
 
 	def _move_(self, op_index, op_type):
 		if self._is_legal_index_(op_index):
 			if op_type == "insert":
-				# 此处用len()函数的原因：防止因为length的在调用_move_()方法之前发生改变带来的错误
-				tail_i = len(self.data) - 1
+				tail_i = self._length
 				while tail_i >= op_index:
-					self.data[tail_i + 1] = self.data[tail_i]
+					self._data[tail_i + 1] = self._data[tail_i]
 					tail_i -= 1
 			elif op_type == "delete":
-				start, end = op_index + 1, len(self.data) - 1
+				start, end = op_index + 1, self._length
 				while start <= end:
-					self.data[start - 1] = self.data[start]
-					start -= 1
-				self.data[end] = None
+					self._data[start - 1] = self._data[start]
+					start += 1
+				self._data[end] = None
 		else:
 			print("Error: index out of range")
 
 	def _is_legal_index_(self, index):
-		return 0 <= index < self.length
+		return 0 <= index < self._length
+
+
+if __name__ == '__main__':
+	# 初始化顺序表
+	seq_list = SeqList(capacity=12)
+	assert seq_list.is_empty() == True
+	assert seq_list.is_full() == False
+	# 添加元素
+	for i in range(10):
+		seq_list.append(i)
+	assert seq_list.len() == 10
+	# 遍历和访问表元素
+	seq_list.travel()
+	assert seq_list.get(0) == 0
+	assert seq_list.search(10) == -1
+	assert seq_list.search_start(3, 1) != -1
+	# 表元素变动操作
+	seq_list.insert(3, 8)
+	assert seq_list.len() == 11
+	assert seq_list.del_first() == True
+	assert seq_list.del_last() == True
+	assert seq_list.del_by_index(3) == True
+	assert seq_list.del_by_element(3) == True
+	assert seq_list.del_by_element(19) == False
+	seq_list.clear()
+	assert seq_list.len() == 0
